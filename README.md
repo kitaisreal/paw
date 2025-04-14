@@ -1,4 +1,4 @@
-# paw
+![Paw logo](paw_logo.png)
 
 paw (Performance Analysis Workbench) is a very simple tool for performance testing, analysis, and continuous iteration over results.
 
