@@ -9,6 +9,14 @@ The tool is tailored for such workflow:
 4. Re-run performance tests, recollect data, and compare the old runs with the new ones.
 5. Repeat :)
 
+## Install
+
+```
+git clone git@github.com:kitaisreal/paw.git
+cd paw
+go build -o paw ./cmd/...
+```
+
 ## Usage Example
 
 By default, config is not required, `clickhouse` driver is used by default, and all drivers and collectors will have default settings.
@@ -105,6 +113,36 @@ View diff between results from `paw_test_result_lhs` folder and `paw_test_result
 ```
 sudo ./paw view paw_test_result_lhs paw_test_result_rhs
 ```
+
+## Web UI Example
+
+By default web UI is available at `http://localhost:2323` if you run `./paw view` command.
+
+Example of view for single test result:
+```
+./paw view clickhouse_dev_clickbench_cpu_only
+```
+
+Queries in single test result:
+
+![Paw single test result view](example/paw_view_single.png)
+
+Query details in single test result:
+
+![Paw single test result query details view](example/paw_view_single_details.png)
+
+Example of view for difference between two test results:
+```
+./paw view clickhouse_dev_clickbench_cpu_only ursa_clickbench_cpu_only
+```
+
+Queries in difference between two test results:
+
+![Paw difference between two test results view](example/paw_view_diff.png)
+
+Query details in difference between two test results:
+
+![Paw difference between two test results query details view](example/paw_view_diff_details.png)
 
 ## Motivation
 
