@@ -1,0 +1,53 @@
+{{ define "title" }}Query {{ .Record.QueryNumber }} Details{{ end }}
+
+{{ define "content" }}
+<h1>Query {{ .Record.QueryNumber }} Details</h1>
+
+<h2>Query Text</h2>
+<div class="query-text-details">{{ .Record.Query }}</div>
+
+<h2>Execution Time Summary (ms)</h2>
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>Min</th>
+            <th>Max</th>
+            <th>Mean</th>
+            <th>Median</th>
+            <th>StdDev</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>Server</th>
+            <td>{{ printf "%.2f" (getMinServerDurationMilliseconds .Stats) }}</td>
+            <td>{{ printf "%.2f" (getMaxServerDurationMilliseconds .Stats) }}</td>
+            <td>{{ printf "%.2f" (getMeanServerDurationMilliseconds .Stats) }}</td>
+            <td>{{ printf "%.2f" (getMedianServerDurationMilliseconds .Stats) }}</td>
+            <td>{{ printf "%.2f" (getStdDevServerDurationMilliseconds .Stats) }}</td>
+        </tr>
+        <tr>
+            <th>Client</th>
+            <td>{{ printf "%.2f" (getMinClientDurationMilliseconds .Stats) }}</td>
+            <td>{{ printf "%.2f" (getMaxClientDurationMilliseconds .Stats) }}</td>
+            <td>{{ printf "%.2f" (getMeanClientDurationMilliseconds .Stats) }}</td>
+            <td>{{ printf "%.2f" (getMedianClientDurationMilliseconds .Stats) }}</td>
+            <td>{{ printf "%.2f" (getStdDevClientDurationMilliseconds .Stats) }}</td>
+        </tr>
+    </tbody>
+</table>
+
+{{ template "iframesScroll" }}
+
+{{ template "collectorTables" (dict "Title" "Collector" "CollectorResults" .Record.CollectorResults "Folder" "lhs"
+"QueryNumber" .Record.QueryNumber) }}
+
+{{ template "executionTimesTable" (dict "Title" "All Execution Times" "Times" .Record.ExecutionTimes) }}
+
+{{ range $collector := .Record.CollectorResults }}
+{{ template "executionTimesTable" (dict "Title" (printf "Collector %s Execution Times" $collector.Name) "Times"
+$collector.ExecutionTimes) }}
+{{ end }}
+
+{{ end }}

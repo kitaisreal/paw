@@ -1,0 +1,82 @@
+{{ define "title" }}Query {{ .LHS.Record.QueryNumber }} Details Comparison{{ end }}
+
+{{ define "content" }}
+<h1>Query Details Comparison</h1>
+<h2>Query Number: {{ .LHS.Record.QueryNumber }}</h2>
+
+<h2>LHS Query Text</h2>
+<div class="query-text-details">{{ .LHS.Record.Query }}</div>
+
+<h2>RHS Query Text</h2>
+<div class="query-text-details">{{ .RHS.Record.Query }}</div>
+
+{{ $relativeMedianServerDurationDiff := getRelativeMedianServerDurationDiff .LHS.Stats .RHS.Stats }}
+{{ $relativeMedianClientDurationDiff := getRelativeMedianClientDurationDiff .LHS.Stats .RHS.Stats }}
+
+<h2>Execution Time Summary (ms)</h2>
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>LHS Min</th>
+            <th>LHS Max</th>
+            <th>LHS Median</th>
+            <th>LHS StdDev</th>
+            <th>RHS Min</th>
+            <th>RHS Max</th>
+            <th>RHS Median</th>
+            <th>RHS StdDev</th>
+            <th>Median Relative Difference (new − old) / old (%)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="{{ getMedianServerDurationRowClass .LHS.Stats .RHS.Stats }}">
+            <th>Server</th>
+            <td>{{ printf "%.2f" (getMinServerDurationMilliseconds .LHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getMaxServerDurationMilliseconds .LHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getMedianServerDurationMilliseconds .LHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getStdDevServerDurationMilliseconds .LHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getMinServerDurationMilliseconds .RHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getMaxServerDurationMilliseconds .RHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getMedianServerDurationMilliseconds .RHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getStdDevServerDurationMilliseconds .RHS.Stats) }}</td>
+            <td>{{ if gt $relativeMedianServerDurationDiff 0.0 }}+{{ end }}{{ printf "%.2f%%"
+                $relativeMedianServerDurationDiff }}</td>
+        </tr>
+        <tr class="{{ getMedianClientDurationRowClass .LHS.Stats .RHS.Stats }}">
+            <th>Client</th>
+            <td>{{ printf "%.2f" (getMinClientDurationMilliseconds .LHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getMaxClientDurationMilliseconds .LHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getMedianClientDurationMilliseconds .LHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getStdDevClientDurationMilliseconds .LHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getMinClientDurationMilliseconds .RHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getMaxClientDurationMilliseconds .RHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getMedianClientDurationMilliseconds .RHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getStdDevClientDurationMilliseconds .RHS.Stats) }}</td>
+            <td>{{ if gt $relativeMedianClientDurationDiff 0.0 }}+{{ end }}{{ printf "%.2f%%"
+                $relativeMedianClientDurationDiff }}</td>
+        </tr>
+    </tbody>
+</table>
+
+{{ template "iframesScroll" }}
+
+{{ template "collectorTables" (dict "Title" "LHS Collector" "CollectorResults" .LHS.Record.CollectorResults
+"Folder" "lhs" "QueryNumber" .LHS.Record.QueryNumber) }}
+{{ template "collectorTables" (dict "Title" "RHS Collector" "CollectorResults" .RHS.Record.CollectorResults
+"Folder" "rhs" "QueryNumber" .RHS.Record.QueryNumber) }}
+
+{{ template "executionTimesTable" (dict "Title" "LHS All Execution Times" "Times" .LHS.Record.ExecutionTimes) }}
+{{ template "executionTimesTable" (dict "Title" "RHS All Execution Times" "Times" .RHS.Record.ExecutionTimes) }}
+
+{{ range .LHS.Record.CollectorResults }}
+{{ template "executionTimesTable" (dict "Title" (printf "LHS collector %s Execution Times" .Name) "Times"
+.ExecutionTimes) }}
+{{ end }}
+
+{{ range .RHS.Record.CollectorResults }}
+{{ template "executionTimesTable" (dict "Title" (printf "RHS collector %s Execution Times" .Name) "Times"
+.ExecutionTimes) }}
+{{ end }}
+
+{{ end }}

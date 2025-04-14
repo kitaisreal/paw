@@ -1,0 +1,28 @@
+{{ define "title" }}Query Results{{ end }}
+
+{{ define "content" }}
+<h1>Query Results</h1>
+<div class="folder-name">Folder: {{ .FolderName }}</div>
+<table>
+    <thead>
+        <tr>
+            <th>Query Number</th>
+            <th>Query Text</th>
+            <th>Median Server Execution Time (ms)</th>
+            <th>Median Client Execution Time (ms)</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .Records }}
+        <tr>
+            <td>{{ .Record.QueryNumber }}</td>
+            <td class="query-text">{{ .Record.Query }}</td>
+            <td class="execution-time">{{ printf "%.2f" (getMedianServerDurationMilliseconds .Stats) }}</td>
+            <td class="execution-time">{{ printf "%.2f" (getMedianClientDurationMilliseconds .Stats) }}</td>
+            <td><a href="/query/{{ .Record.QueryNumber }}">Details</a></td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ end }}

@@ -1,0 +1,66 @@
+run:
+  deadline: 8m
+
+output:
+  formats:
+    - format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+
+linters:
+  disable-all: true
+  enable:
+    # Enabled by default
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+
+    - lll
+    - gofmt
+    - revive
+    - unconvert
+    - goconst
+    - misspell
+    - gocyclo
+    - stylecheck
+    - whitespace
+    - nestif
+    - goprintffuncname
+    - godot
+    - gocognit
+    - funlen
+    - dupl
+    - errorlint
+    - copyloopvar
+    - forcetypeassert
+    - rowserrcheck
+    - gochecksumtype
+    - goimports
+
+linters-settings:
+  lll:
+    line-length: 120
+  govet:
+    shadow: true
+  golint:
+    min-confidence: 0.8
+  stylecheck:
+    # https://staticcheck.io/docs/options#checks
+    checks: ["all"]
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  funlen:
+    lines: 140
+    statements: 80
+
+issues:
+  exclude-rules:
+    - path: (.*_test\.go)
+      text: "Function '.*' is too long"
+
+  max-per-linter: 0
+  max-same-issues: 0

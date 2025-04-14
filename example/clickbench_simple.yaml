@@ -1,0 +1,6 @@
+name: ClickBenchSimple
+collectors:
+  - cpu_flamegraph
+  - off_cpu_flamegraph
+queries:
+  - SELECT COUNT(*) FROM hits WHERE URL LIKE '%google%';

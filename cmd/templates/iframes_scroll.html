@@ -1,0 +1,21 @@
+{{ define "iframesScroll" }}
+<script>
+    window.addEventListener('load', function () {
+        const iframes = document.querySelectorAll('iframe');
+
+        function scrollIframe(iframe) {
+            const iframeDocument = iframe.contentWindow.document;
+            const scrollHeight = iframeDocument.documentElement.scrollHeight;
+            iframe.contentWindow.scrollTo(0, scrollHeight);
+        }
+
+        iframes.forEach(function (iframe) {
+            iframe.addEventListener('load', function () {
+                scrollIframe(iframe);
+            });
+
+            scrollIframe(iframe);
+        });
+    });
+</script>
+{{ end }}

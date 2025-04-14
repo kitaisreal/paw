@@ -1,0 +1,90 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1,
+h2 {
+    color: #2c3e50;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    margin-top: 20px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+tr:hover {
+    background-color: #e8e8e8;
+}
+
+.folder-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.query-text {
+    max-width: 500px;
+    word-wrap: break-word;
+}
+
+.query-text-details {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.execution-time {
+    width: 100px;
+    text-align: right;
+}
+
+.flamegraph {
+    height: 600px;
+    /* This is necessary to prevent the iframe from displaying horizontall scroll bar, size of flamegraph content is 1200px */
+    width: 1220px;
+    justify-content: center;
+    margin-top: 20px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+.flamegraph iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.significant-positive-diff {
+    background-color: #d4edda !important;
+}
+
+.significant-negative-diff {
+    background-color: #f8d7da !important;
+}

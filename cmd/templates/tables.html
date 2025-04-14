@@ -1,0 +1,21 @@
+{{ define "executionTimesTable" }}
+<h2>{{.Title}}</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Run</th>
+            <th>Client Duration (ms)</th>
+            <th>Server Duration (ms)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range $index, $time := .Times }}
+        <tr>
+            <td>{{ add $index 1 }}</td>
+            <td>{{ printf "%.2f" (getClientDurationMilliseconds $time) }}</td>
+            <td>{{ printf "%.2f" (getServerDurationMilliseconds $time) }}</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ end }}

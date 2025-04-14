@@ -1,0 +1,21 @@
+{{ define "collectorTables" }}
+
+{{ $title := .Title }}
+{{ $folder := .Folder }}
+{{ $queryNumber := .QueryNumber }}
+
+{{ range $collector := .CollectorResults }}
+<h2>{{$title}} {{ $collector.Name }}</h2>
+{{ range $file := $collector.Files }}
+{{ if eq $file.Type "flamegraph" }}
+<div class="flamegraph">
+    <iframe
+        src="/file/?folder={{$folder}}&query={{$queryNumber}}&collector={{$collector.Name}}&file={{$file.Name}}"
+        type="image/svg+xml">
+    </iframe>
+</div>
+{{ end }}
+{{ end }}
+{{ end }}
+
+{{ end }}

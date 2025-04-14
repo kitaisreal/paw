@@ -1,0 +1,37 @@
+{{ define "title" }}Query Results Comparison{{ end }}
+
+{{ define "content" }}
+<h1>Query Results Comparison</h1>
+<div class="folder-name">LHS Folder: {{ .LHSFolder }}</div>
+<div class="folder-name">RHS Folder: {{ .RHSFolder }}</div>
+<table>
+    <thead>
+        <tr>
+            <th>Query Number</th>
+            <th>LHS Query</th>
+            <th>RHS Query</th>
+            <th>LHS Median Server Execution Time (ms)</th>
+            <th>RHS Median Server Execution Time (ms)</th>
+            <th>Median Server Execution Time Relative Difference (new − old) / old (%)</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .QueryRecordPairs }}
+
+        {{ $relativeMedianServerDurationDiff := getRelativeMedianServerDurationDiff .LHS.Stats .RHS.Stats }}
+
+        <tr class="{{ getMedianServerDurationRowClass .LHS.Stats .RHS.Stats }}">
+            <td>{{ .LHS.Record.QueryNumber }}</td>
+            <td>{{ .LHS.Record.Query }}</td>
+            <td>{{ .RHS.Record.Query }}</td>
+            <td>{{ printf "%.2f" (getMedianServerDurationMilliseconds .LHS.Stats) }}</td>
+            <td>{{ printf "%.2f" (getMedianServerDurationMilliseconds .RHS.Stats) }}</td>
+            <td>{{ if gt $relativeMedianServerDurationDiff 0.0 }}+{{ end }}{{ printf "%.2f%%"
+                $relativeMedianServerDurationDiff }}</td>
+            <td><a href="/query/{{ .LHS.Record.QueryNumber }}">Details</a></td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ end }}
