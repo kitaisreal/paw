@@ -1,17 +1,35 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/kitaisreal/paw/internal/logger"
 	"github.com/spf13/cobra"
 )
 
+// Injected at build time via -ldflags by GoReleaser.
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 var (
 	rootCmd = &cobra.Command{
-		Use:   "paw",
-		Short: "Performance testing tool",
-		Long:  "A tool for performance testing",
+		Use:     "paw",
+		Short:   "Performance testing tool",
+		Long:    "A tool for performance testing",
+		Version: version,
+	}
+
+	versionCmd = &cobra.Command{
+		Use:   "version",
+		Short: "Print version information",
+		Long:  "Print version information",
+		Run: func(_ *cobra.Command, _ []string) {
+			fmt.Printf("paw %s (commit %s, built %s)\n", version, commit, date)
+		},
 	}
 
 	recordCmd = &cobra.Command{
@@ -47,6 +65,8 @@ func prerunEnableDebugLogger(_ *cobra.Command, _ []string) {
 }
 
 func init() {
+	rootCmd.AddCommand(versionCmd)
+
 	rootCmd.AddCommand(recordCmd)
 	recordCmd.Flags().StringVarP(&configPath,
 		"config",
