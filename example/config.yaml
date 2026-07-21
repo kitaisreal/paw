@@ -3,25 +3,25 @@ profiles:
     driver: clickhouse
     settings:
       host: 127.0.0.1
-      port: 9000
+      port: 8123
   - name: clickhouse_scatter_aggregation
     driver: clickhouse
     settings:
       host: 127.0.0.1
-      port: 9000
+      port: 8123
       force_scatter_aggregation: 1
   - name: clickhouse_aggregation_scatter_copy_chunks
     driver: clickhouse
     settings:
       host: 127.0.0.1
-      port: 9000
+      port: 8123
       aggregation_scatter_based_on_statistics: 1
       aggregation_default_scatter_algorithm: copy_chunks
   - name: clickhouse_aggregation_scatter_indexes_info
     driver: clickhouse
     settings:
       host: 127.0.0.1
-      port: 9000
+      port: 8123
       aggregation_scatter_based_on_statistics: 1
       aggregation_default_scatter_algorithm: indexes_info
 collector_profiles:
