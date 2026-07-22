@@ -82,7 +82,7 @@
     <tbody>
         {{ range $row := $profileEventsDiff }}
         <tr>
-            <th>{{ $row.Name }}</th>
+            <td>{{ $row.Name }}</td>
             <td>{{ if $row.LHSExists }}{{ $row.LHSValue }}{{ else }}not exist{{ end }}</td>
             <td>{{ if $row.RHSExists }}{{ $row.RHSValue }}{{ else }}not exist{{ end }}</td>
             <td>{{ if $row.Both }}{{ if gt $row.Delta 0 }}+{{ end }}{{ $row.Delta }}{{ else }}-{{ end }}</td>
