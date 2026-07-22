@@ -3,8 +3,13 @@
 {{ $title := .Title }}
 {{ $folder := .Folder }}
 {{ $queryNumber := .QueryNumber }}
+{{ $showProfileEvents := .ShowProfileEvents }}
 
 {{ range $collector := .CollectorResults }}
+{{ $hasFlamegraph := false }}
+{{ range $file := $collector.Files }}{{ if eq $file.Type "flamegraph" }}{{ $hasFlamegraph = true }}{{ end }}{{ end }}
+{{ $hasProfileEvents := and $showProfileEvents (gt (len $collector.ProfileEvents) 0) }}
+{{ if or $hasFlamegraph $hasProfileEvents }}
 <h2>{{$title}} {{ $collector.Name }}</h2>
 {{ range $file := $collector.Files }}
 {{ if eq $file.Type "flamegraph" }}
@@ -14,6 +19,25 @@
         type="image/svg+xml">
     </iframe>
 </div>
+{{ end }}
+{{ end }}
+{{ if $hasProfileEvents }}
+<table>
+    <thead>
+        <tr>
+            <th>Profile Event</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range $name, $value := $collector.ProfileEvents }}
+        <tr>
+            <th>{{ $name }}</th>
+            <td>{{ $value }}</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
 {{ end }}
 {{ end }}
 {{ end }}
