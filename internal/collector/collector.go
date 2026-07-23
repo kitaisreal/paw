@@ -10,7 +10,8 @@ import (
 type FileType string
 
 const (
-	FileTypeFlamegraph FileType = "flamegraph"
+	FileTypeFlamegraph    FileType = "flamegraph"
+	FileTypeProfileEvents FileType = "profile_events"
 )
 
 type ResultFile struct {
@@ -22,6 +23,7 @@ type Result struct {
 	Name           string                 `json:"name"`
 	Files          []ResultFile           `json:"files"`
 	ExecutionTimes []driver.ExecutionTime `json:"execution_times"`
+	ProfileEvents  driver.ProfileEvents   `json:"profile_events,omitempty"`
 }
 
 type Settings = map[string]any

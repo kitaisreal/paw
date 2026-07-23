@@ -15,6 +15,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kitaisreal/paw/internal/collector"
 	"github.com/kitaisreal/paw/internal/config"
 	"github.com/kitaisreal/paw/internal/driver"
 	"github.com/kitaisreal/paw/internal/logger"
@@ -370,15 +371,93 @@ var (
 	viewDiffQueryDetailsTemplate   *template.Template
 )
 
-func init() {
-	var getRelativeDiff = func(lhs, rhs float64) float64 {
-		if lhs == 0 {
-			lhs = 1e-6
-		}
-
-		return (rhs - lhs) / lhs * 100
+// getRelativeDiff returns the relative difference between lhs and rhs as a
+// percentage: (rhs - lhs) / lhs * 100.
+func getRelativeDiff(lhs, rhs float64) float64 {
+	if lhs == 0 {
+		lhs = 1e-6
 	}
 
+	return (rhs - lhs) / lhs * 100
+}
+
+// ProfileEventDiffRow is a single row of the diff view profile events table.
+// LHSExists / RHSExists report whether the event was present on each side; a
+// missing side is rendered as "not exist".
+type ProfileEventDiffRow struct {
+	Name      string
+	LHSValue  uint64
+	LHSExists bool
+	RHSValue  uint64
+	RHSExists bool
+}
+
+func (r ProfileEventDiffRow) Both() bool {
+	return r.LHSExists && r.RHSExists
+}
+
+func (r ProfileEventDiffRow) Delta() int64 {
+	return int64(r.RHSValue) - int64(r.LHSValue)
+}
+
+func (r ProfileEventDiffRow) RelativePercent() float64 {
+	return getRelativeDiff(float64(r.LHSValue), float64(r.RHSValue))
+}
+
+// mergeProfileEvents merges the profile events across all collector results.
+// In practice a query has a single profile_events collector.
+func mergeProfileEvents(results []collector.Result) driver.ProfileEvents {
+	merged := driver.ProfileEvents{}
+	for _, result := range results {
+		for name, value := range result.ProfileEvents {
+			merged[name] = value
+		}
+	}
+
+	return merged
+}
+
+// getProfileEventsDiffRows builds the union of profile events across the lhs
+// and rhs collector results, sorted by name, marking whichever side is absent.
+func getProfileEventsDiffRows(lhsResults, rhsResults []collector.Result) []ProfileEventDiffRow {
+	lhsProfileEvents := mergeProfileEvents(lhsResults)
+	rhsProfileEvents := mergeProfileEvents(rhsResults)
+
+	if len(lhsProfileEvents) == 0 && len(rhsProfileEvents) == 0 {
+		return nil
+	}
+
+	names := map[string]struct{}{}
+	for name := range lhsProfileEvents {
+		names[name] = struct{}{}
+	}
+	for name := range rhsProfileEvents {
+		names[name] = struct{}{}
+	}
+
+	sortedNames := make([]string, 0, len(names))
+	for name := range names {
+		sortedNames = append(sortedNames, name)
+	}
+	sort.Strings(sortedNames)
+
+	rows := make([]ProfileEventDiffRow, 0, len(sortedNames))
+	for _, name := range sortedNames {
+		lhsValue, lhsExists := lhsProfileEvents[name]
+		rhsValue, rhsExists := rhsProfileEvents[name]
+		rows = append(rows, ProfileEventDiffRow{
+			Name:      name,
+			LHSValue:  lhsValue,
+			LHSExists: lhsExists,
+			RHSValue:  rhsValue,
+			RHSExists: rhsExists,
+		})
+	}
+
+	return rows
+}
+
+func init() {
 	var getMedianRowClass = func(lhs, rhs float64) string {
 		relativeDifference := getRelativeDiff(lhs, rhs)
 
@@ -463,6 +542,7 @@ func init() {
 		"getMedianClientDurationRowClass": func(lhs, rhs stats.Stats) string {
 			return getMedianRowClass(lhs.GetMedianClientDurationMilliseconds(), rhs.GetMedianClientDurationMilliseconds())
 		},
+		"getProfileEventsDiff": getProfileEventsDiffRows,
 	}
 
 	var buildTemplate = func(pageTemplate string) *template.Template {

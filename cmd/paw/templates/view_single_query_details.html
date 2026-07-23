@@ -41,7 +41,7 @@
 {{ template "iframesScroll" }}
 
 {{ template "collectorTables" (dict "Title" "Collector" "CollectorResults" .Record.CollectorResults "Folder" "lhs"
-"QueryNumber" .Record.QueryNumber) }}
+"QueryNumber" .Record.QueryNumber "ShowProfileEvents" true) }}
 
 {{ template "executionTimesTable" (dict "Title" "All Execution Times" "Times" .Record.ExecutionTimes) }}
 

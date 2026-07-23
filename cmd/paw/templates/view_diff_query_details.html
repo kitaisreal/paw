@@ -62,9 +62,37 @@
 {{ template "iframesScroll" }}
 
 {{ template "collectorTables" (dict "Title" "LHS Collector" "CollectorResults" .LHS.Record.CollectorResults
-"Folder" "lhs" "QueryNumber" .LHS.Record.QueryNumber) }}
+"Folder" "lhs" "QueryNumber" .LHS.Record.QueryNumber "ShowProfileEvents" false) }}
 {{ template "collectorTables" (dict "Title" "RHS Collector" "CollectorResults" .RHS.Record.CollectorResults
-"Folder" "rhs" "QueryNumber" .RHS.Record.QueryNumber) }}
+"Folder" "rhs" "QueryNumber" .RHS.Record.QueryNumber "ShowProfileEvents" false) }}
+
+{{ $profileEventsDiff := getProfileEventsDiff .LHS.Record.CollectorResults .RHS.Record.CollectorResults }}
+{{ if $profileEventsDiff }}
+<h2>Profile Events Comparison</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Profile Event</th>
+            <th>LHS</th>
+            <th>RHS</th>
+            <th>Difference (new − old)</th>
+            <th>Relative Difference (new − old) / old (%)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range $row := $profileEventsDiff }}
+        <tr>
+            <td>{{ $row.Name }}</td>
+            <td>{{ if $row.LHSExists }}{{ $row.LHSValue }}{{ else }}not exist{{ end }}</td>
+            <td>{{ if $row.RHSExists }}{{ $row.RHSValue }}{{ else }}not exist{{ end }}</td>
+            <td>{{ if $row.Both }}{{ if gt $row.Delta 0 }}+{{ end }}{{ $row.Delta }}{{ else }}-{{ end }}</td>
+            <td>{{ if $row.Both }}{{ if gt $row.RelativePercent 0.0 }}+{{ end }}{{ printf "%.2f%%" $row.RelativePercent
+                }}{{ else }}-{{ end }}</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ end }}
 
 {{ template "executionTimesTable" (dict "Title" "LHS All Execution Times" "Times" .LHS.Record.ExecutionTimes) }}
 {{ template "executionTimesTable" (dict "Title" "RHS All Execution Times" "Times" .RHS.Record.ExecutionTimes) }}

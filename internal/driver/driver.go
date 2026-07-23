@@ -11,10 +11,22 @@ type ExecutionTime struct {
 	ServerDuration time.Duration `json:"server_duration"`
 }
 
+// ProfileEvents holds engine-specific performance counters collected for a
+// single query run.
+type ProfileEvents = map[string]uint64
+
 type Settings = map[string]any
 
 type Driver interface {
-	Run(ctx context.Context, command string) (ExecutionTime, error)
+	Run(ctx context.Context, query string) (ExecutionTime, error)
+
+	// SupportsProfileEvents reports whether RunWithProfileEvents is implemented.
+	// Callers must check this before calling RunWithProfileEvents.
+	SupportsProfileEvents() bool
+
+	// RunWithProfileEvents runs the query and returns its profile events.
+	// It panics if SupportsProfileEvents returns false.
+	RunWithProfileEvents(ctx context.Context, query string) (ExecutionTime, ProfileEvents, error)
 }
 
 type Creator = func(settings Settings) (Driver, error)
