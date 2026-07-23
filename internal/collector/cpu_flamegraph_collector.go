@@ -17,6 +17,7 @@ const (
 	cpuFlameGraphCollectorFlameGraphDefaultBuildSeconds     = 5
 	cpuFlameGraphCollectorFlameGraphBuildSecondsSettingName = "build_seconds"
 	cpuFlameGraphCollectorOutputFile                        = "cpu_flamegraph.svg"
+	cpuFlameGraphCollectorFoldedOutputFile                  = "perf.folded"
 )
 
 type CPUFlamegraphCollector struct {
@@ -110,9 +111,11 @@ func (c *CPUFlamegraphCollector) Collect(
 			return
 		}
 
-		pawFoldedDataFileName := filepath.Join(c.tempDir, "paw.out.perf-folded")
+		// Persist the symbolized folded stacks: self-contained, portable and cheap to analyze
+		// (grep/awk) without re-running the slow perf script symbolization.
+		pawFoldedDataFileName := filepath.Join(outputFolder, cpuFlameGraphCollectorFoldedOutputFile)
 		foldPerfDataCmdArg := fmt.Sprintf(
-			"perf script -i %s | %s > %s",
+			"perf script -i %s --no-inline --max-stack 1024 | %s > %s",
 			pawDataFileName,
 			c.stackCollapseScriptPath,
 			pawFoldedDataFileName,
@@ -155,6 +158,14 @@ func (c *CPUFlamegraphCollector) Collect(
 
 		if err := os.Chmod(cpuFlamegraphOutputFilePath, 0664); err != nil {
 			waitChan <- fmt.Errorf("collector %s failed to set permissions for flamegraph output file: %w",
+				cpuFlameGraphCollectorName,
+				err)
+			return
+		}
+
+		// paw records as root, so make the folded stacks readable without sudo.
+		if err := os.Chmod(pawFoldedDataFileName, 0664); err != nil {
+			waitChan <- fmt.Errorf("collector %s failed to set permissions for folded output file: %w",
 				cpuFlameGraphCollectorName,
 				err)
 			return
